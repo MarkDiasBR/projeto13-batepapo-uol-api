@@ -9,7 +9,7 @@ server.use(cors());
 server.use(json());
 dotenv.config();
 
-const mongoClient = new MongoClient(process.env.MONGO_URI);
+const mongoClient = new MongoClient(process.env.DATABASE_URL);
 let db;
 
 mongoClient.connect()
@@ -18,6 +18,7 @@ mongoClient.connect()
     })
     .catch((err) => console.log(err.message));
 
-server.listen(process.env.BACKEND_PORT, () => {
-    console.log(`Servidor conectado na porta ${process.env.BACKEND_PORT}`);
+const BACKEND_PORT = 5000;
+server.listen(BACKEND_PORT, () => {
+    console.log(`Servidor conectado na porta ${BACKEND_PORT}`);
 });
