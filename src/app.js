@@ -34,7 +34,7 @@ app.post('/participants', async (req, res) => {
             text: 'entra na sala...',
             type: 'status',
             time: dayjs().format('HH:mm:ss')
-        }).json();
+        });
         res.status(201).send('User successfully created');
     } catch (err) {
         res.status(500).send(err.message);
@@ -92,7 +92,7 @@ app.post('/status', async (req, res) => {
 
 const PORT = 5000;
 app.listen(PORT, () => {
-    console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}` );
+    console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}`);
 });
 
 async function removeIdle() {
