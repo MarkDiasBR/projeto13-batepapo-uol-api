@@ -52,7 +52,7 @@ app.get('/participants', async (req, res) => {
 });
 
 app.post('/messages', async (req, res) => {
-    const { to, text, type } = req.body;
+    let { to, text, type } = req.body;
     let user = req.header('User');
 
     to = sanitizeInput(to);
