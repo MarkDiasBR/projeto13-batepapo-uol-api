@@ -1,12 +1,12 @@
 import express, { json } from 'express';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-const server = express();
+const app = express();
 
-server.use(cors());
-server.use(json());
+app.use(cors());
+app.use(express.json());
 dotenv.config();
 
 const mongoClient = new MongoClient(process.env.DATABASE_URL);
@@ -21,19 +21,19 @@ try {
     console.error(err.message)
 }
 
-server.get('/oi', (req, res) => {
+app.get('/oi', (req, res) => {
     res.send('oi');
 })
 
-server.post('/participants', async (req, res) => {
+app.post('/participants', async (req, res) => {
     const { name } = req.body;
 
 
     try {
         await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
-        res.status(201).send('User successfully created')
+        res.status(201).send('User successfully created');
     } catch (err) {
-        console.error(err.message);
+        res.status(500).send(err.message);
     }
 });
 
@@ -46,6 +46,6 @@ server.post('/participants', async (req, res) => {
 //     .catch((err) => console.log(err.message));
 
 const BACKEND_PORT = 5000;
-server.listen(BACKEND_PORT, () => {
+app.listen(BACKEND_PORT, () => {
     console.log(`Server successfully connected at PORT: ${BACKEND_PORT}; Server URL: http://localhost:${BACKEND_PORT}` );
 });
