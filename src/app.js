@@ -34,7 +34,7 @@ app.post('/participants', async (req, res) => {
             text: 'entra na sala...',
             type: 'status',
             time: dayjs().format('HH:mm:ss')
-        });
+        }).json();
         res.status(201).send('User successfully created');
     } catch (err) {
         res.status(500).send(err.message);
