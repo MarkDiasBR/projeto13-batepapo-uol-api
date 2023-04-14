@@ -22,6 +22,17 @@ try {
     console.error(err.message);
 }
 
+app.post('/participants', async (req, res) => {
+    const { name } = req.body;
+
+    try {
+        await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
+        res.status(201).send('User successfully created');
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}` );
