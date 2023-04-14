@@ -1,7 +1,8 @@
-import express, { json } from "express";
-import { MongoClient, ObjectId } from "mongodb";
-import cors from "cors";
-import dotenv from "dotenv";
+import express, { json } from 'express';
+import { MongoClient, ObjectId } from 'mongodb';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import dayjs from 'dayjs';
 
 const app = express();
 
@@ -17,29 +18,9 @@ try {
     db = mongoClient.db();
     console.log(`Database successfully connected with server; Database URL: ${process.env.DATABASE_URL}`);
 } catch (err) {
-    console.log("Database connection failed");
+    console.log('Database connection failed');
     console.error(err.message);
 }
-
-app.get("/participants", async (req, res) => {
-    try {
-        const participants = await db.collection("participants").find().toArray();
-        res.send(participants);
-    } catch (err) {
-        res.status(500).send("Não há nenhum participante no momento")
-    }
-});
-
-app.post("/participants", async (req, res) => {
-    const { name } = req.body;
-
-    try {
-        await db.collection("participants").insertOne({ name, lastStatus: Date.now() });
-        res.status(201).send("User successfully created");
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
 
 const PORT = 5000;
 app.listen(PORT, () => {
