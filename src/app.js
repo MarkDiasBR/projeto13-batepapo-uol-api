@@ -97,6 +97,32 @@ app.delete('/messages/:id', async (req, res) => {
     };
 });
 
+app.put('/messages/:id', async (req, res) => {
+    let { to, text, type } = req.body;
+    let user = req.header('User');
+    const { id } = req.params;
+
+    to = sanitizeInput(to);
+    text = sanitizeInput(text);
+    type = sanitizeInput(type);
+    user = sanitizeInput(user);
+
+    const message = {
+        from: user,
+        to,
+        text,
+        type
+        // time: dayjs().format('HH:mm:ss')
+    };
+
+    try {
+        await db.collection('messages').updateOne({ _id: new ObjectId(id) }, { $set: message });
+        res.sendStatus(201);
+    } catch (err) {
+        res.status(500).send(err.message);
+    };
+});
+
 app.post('/status', async (req, res) => {
     const user = req.header('User');
 
