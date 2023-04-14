@@ -30,7 +30,7 @@ server.post('/participants', async (req, res) => {
 
 
     try {
-        await db.collection('participants').insertOne({ name });
+        await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
         res.status(201).send('User successfully created')
     } catch (err) {
         console.error(err.message);
