@@ -28,11 +28,10 @@ app.get("/participants", async (req, res) => {
     } catch (err) {
         res.status(500).send("Não há nenhum participante no momento")
     }
-}) 
+});
 
 app.post("/participants", async (req, res) => {
     const { name } = req.body;
-
 
     try {
         await db.collection("participants").insertOne({ name, lastStatus: Date.now() });
