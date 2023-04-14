@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 dotenv.config();
 
 let db;
@@ -17,8 +17,8 @@ try {
     db = mongoClient.db();
     console.log(`Database successfully connected with server; Database URL: ${process.env.DATABASE_URL}`);
 } catch (err) {
-    console.log("Database connection failed")
-    console.error(err.message)
+    console.log("Database connection failed");
+    console.error(err.message);
 }
 
 app.get("/oi", (req, res) => {
