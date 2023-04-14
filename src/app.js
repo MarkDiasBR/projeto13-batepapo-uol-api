@@ -71,6 +71,18 @@ app.get('/messages', async (req, res) => {
     };
 });
 
+app.post('/status', async (req, res) => {
+    const user = req.header('User');
+
+    try {
+        const result = await db.collection('participants').updateOne({ name: user }, { $set: { lastStatus: Date.now() } });
+        res.send('User lastStatus updated')
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+        
+})
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}` );
