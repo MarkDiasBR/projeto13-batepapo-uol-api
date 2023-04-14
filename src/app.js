@@ -21,6 +21,12 @@ try {
     console.error(err.message)
 }
 
+app.get('/oi', (req, res) => {
+    res.send('oi');
+})
+
+app.post('/')
+
 // app.
 // mongoClient.connect()
 //     .then(() => {
