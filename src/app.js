@@ -27,6 +27,7 @@ app.post('/participants', async (req, res) => {
 
     try {
         await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
+        await db.collection('messages').insertOne({ from: name, to: 'Todos', text: 'entra na sala...', type: 'status', time: dayjs().format('HH:mm:ss') });
         res.status(201).send('User successfully created');
     } catch (err) {
         res.status(500).send(err.message);
@@ -79,11 +80,31 @@ app.post('/status', async (req, res) => {
         res.send('User lastStatus updated')
     } catch (err) {
         res.status(500).send(err.message);
-    }
-        
-})
+    };        
+});
 
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}` );
 });
+
+async function removeIdle() {
+    try {
+        const timestamp = Date.now();
+
+        let result = await db.collection('participants').find({ lastStatus: { $lt: (timestamp - 10000) } }).toArray();
+
+        console.log(result);
+
+        await Promise.all(
+            result.map(async (participant) => {
+                await db.collection('messages').insertOne({ from: participant.name, to: 'Todos', text: 'sai da sala...', type: 'status', time: dayjs().format('HH:mm:ss') });
+                await db.collection('participants').deleteOne({ name: participant.name });
+            })
+        );
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+setInterval(removeIdle, 15*1000)
