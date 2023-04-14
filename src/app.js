@@ -33,6 +33,15 @@ app.post('/participants', async (req, res) => {
     }
 });
 
+app.get('/participants', async (req, res) => {
+    try {
+        const participants = await db.collection('participants').find().toArray();
+        res.send(participants);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}` );
