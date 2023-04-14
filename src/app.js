@@ -42,6 +42,26 @@ app.get('/participants', async (req, res) => {
     }
 });
 
+app.post('/messages', async (req, res) => {
+    const { to, text, type } = req.body;
+    const user = req.header('User');
+
+    const message = {
+        from: user,
+        to,
+        text,
+        type,
+        time: dayjs().format('HH:mm:ss')
+    };
+
+    try {
+        await db.collection('messages').insertOne( message );
+        res.sendStatus(201);
+    } catch (err) {
+        res.status(500).send(err.message);
+    };
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}` );
