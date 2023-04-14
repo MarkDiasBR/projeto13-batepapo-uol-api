@@ -3,22 +3,33 @@ import { MongoClient } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-const server = express();
+const app = express();
 
-server.use(cors());
-server.use(json());
+app.use(cors());
+app.use(json());
 dotenv.config();
 
 const mongoClient = new MongoClient(process.env.DATABASE_URL);
 let db;
 
-mongoClient.connect()
-    .then(() => {
-	    db = mongoClient.db(); 
-    })
-    .catch((err) => console.log(err.message));
+try {
+    await mongoClient.connect();
+    db = mongoClient.db();
+    console.log(`Database successfully connected with server; Database URL: ${process.env.DATABASE_URL}`);
+} catch (err) {
+    console.log('Database connection failed')
+    console.error(err.message)
+}
+
+// app.
+// mongoClient.connect()
+//     .then(() => {
+// 	    db = mongoClient.db();
+//         console.log(`Database successfully connected with server; Database URL: ${process.env.DATABASE_URL}`);
+//     })
+//     .catch((err) => console.log(err.message));
 
 const BACKEND_PORT = 5000;
-server.listen(BACKEND_PORT, () => {
-    console.log(`Servidor conectado na porta ${BACKEND_PORT}`);
+app.listen(BACKEND_PORT, () => {
+    console.log(`Server successfully connected at PORT: ${BACKEND_PORT}; Server URL: http://localhost:${BACKEND_PORT}` );
 });
