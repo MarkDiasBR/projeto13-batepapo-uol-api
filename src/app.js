@@ -85,6 +85,18 @@ app.get('/messages', async (req, res) => {
     };
 });
 
+app.delete('/messages/:id', async (req, res) => {
+    let user = req.header('User');
+    const { id } = req.params;
+
+    try {
+        const messages = await db.collection('messages').deleteOne({ _id: new ObjectId(id) });
+        res.send(messages);
+    } catch (err) {
+        res.status(500).send(err.message);
+    };
+});
+
 app.post('/status', async (req, res) => {
     const user = req.header('User');
 
@@ -102,7 +114,7 @@ app.listen(PORT, () => {
 });
 
 function sanitizeInput(str) {
-    return stripHtml(str).result.trim();
+    return (stripHtml(str).result).trim();
 }
 
 async function removeIdle() {
