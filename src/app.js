@@ -1,11 +1,11 @@
-import express from "express";
+import express, { json } from "express";
 import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import dotenv from "dotenv";
 
 const app = express();
 
-app.use(express.json());
+app.use(json());
 app.use(cors());
 dotenv.config();
 
@@ -20,10 +20,6 @@ try {
     console.log("Database connection failed");
     console.error(err.message);
 }
-
-app.get("/oi", (req, res) => {
-    res.send("oi");
-})
 
 app.get("/participants", async (req, res) => {
     try {
@@ -45,14 +41,6 @@ app.post("/participants", async (req, res) => {
         res.status(500).send(err.message);
     }
 });
-
-// app.
-// mongoClient.connect()
-//     .then(() => {
-// 	    db = mongoClient.db();
-//         console.log(`Database successfully connected with server; Database URL: ${process.env.DATABASE_URL}`);
-//     })
-//     .catch((err) => console.log(err.message));
 
 const PORT = 5000;
 app.listen(PORT, () => {
