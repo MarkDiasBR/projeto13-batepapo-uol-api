@@ -3,10 +3,10 @@ import { MongoClient } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-const app = express();
+const server = express();
 
-app.use(cors());
-app.use(json());
+server.use(cors());
+server.use(json());
 dotenv.config();
 
 const mongoClient = new MongoClient(process.env.DATABASE_URL);
@@ -21,11 +21,21 @@ try {
     console.error(err.message)
 }
 
-app.get('/oi', (req, res) => {
+server.get('/oi', (req, res) => {
     res.send('oi');
 })
 
-app.post('/')
+server.post('/participants', async (req, res) => {
+    const { name } = req.body;
+
+
+    try {
+        await db.collection('participants').insertOne({ name });
+        res.status(201).send('User successfully created')
+    } catch (err) {
+        console.error(err.message);
+    }
+});
 
 // app.
 // mongoClient.connect()
@@ -36,6 +46,6 @@ app.post('/')
 //     .catch((err) => console.log(err.message));
 
 const BACKEND_PORT = 5000;
-app.listen(BACKEND_PORT, () => {
+server.listen(BACKEND_PORT, () => {
     console.log(`Server successfully connected at PORT: ${BACKEND_PORT}; Server URL: http://localhost:${BACKEND_PORT}` );
 });
