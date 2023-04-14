@@ -29,11 +29,11 @@ app.post('/participants', async (req, res) => {
     try {
         await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
         await db.collection('messages').insertOne({
-            from: `${name}`,
-            to: "Todos",
-            text: "entra na sala...",
+            from: name,
+            to: 'Todos',
+            text: 'entra na sala...',
             type: 'status',
-            time: `${dayjs().format('HH:mm:ss')}`
+            time: dayjs().format('HH:mm:ss')
         });
         res.status(201).send('User successfully created');
     } catch (err) {
@@ -105,7 +105,13 @@ async function removeIdle() {
 
         await Promise.all(
             result.map(async (participant) => {
-                await db.collection('messages').insertOne({ from: participant.name, to: 'Todos', text: 'sai da sala...', type: 'status', time: dayjs().format('HH:mm:ss') });
+                await db.collection('messages').insertOne({
+                    from: participant.name,
+                    to: 'Todos',
+                    text: 'sai da sala...',
+                    type: 'status',
+                    time: dayjs().format('HH:mm:ss')
+                });
                 await db.collection('participants').deleteOne({ name: participant.name });
             })
         );
@@ -114,4 +120,4 @@ async function removeIdle() {
     }
 }
 
-setInterval(removeIdle, 10*1000)
+setInterval(removeIdle, 15*1000)
