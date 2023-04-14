@@ -3,6 +3,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import dayjs from 'dayjs';
+import { stripHtml } from "string-strip-html";
 
 const app = express();
 
@@ -24,7 +25,7 @@ try {
 
 //AVALIADOR: Cadastro de participante
 app.post('/participants', async (req, res) => {
-    const { name } = req.body;
+    const name = sanitizeInput(req.body.name);
 
     try {
         await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
@@ -95,6 +96,10 @@ app.listen(PORT, () => {
     console.log(`Server successfully connected at PORT: ${PORT}; Server URL: http://localhost:${PORT}`);
 });
 
+function sanitizeInput(str) {
+    return stripHtml(str).result.trim();
+}
+
 async function removeIdle() {
     try {
         const timestamp = Date.now();
@@ -120,4 +125,4 @@ async function removeIdle() {
     }
 }
 
-setInterval(removeIdle, 15*1000)
+setInterval(removeIdle, 15*1000);
