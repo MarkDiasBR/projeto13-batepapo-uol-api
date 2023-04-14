@@ -117,7 +117,7 @@ app.put('/messages/:id', async (req, res) => {
 
     try {
         await db.collection('messages').updateOne({ _id: new ObjectId(id) }, { $set: message });
-        res.sendStatus(201);
+        res.sendStatus(200);
     } catch (err) {
         res.status(500).send(err.message);
     };
