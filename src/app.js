@@ -109,7 +109,7 @@ app.post('/messages', async (req, res) => {
     if (!userFind) {
         res.status(422).send('User not logged in.');
         return;
-    };
+    }
 
     let { to, text, type } = req.body;
     
@@ -231,12 +231,14 @@ app.put('/messages/:id', async (req, res) => {
     text = sanitizeInput(text);
     type = sanitizeInput(type);
     user = sanitizeInput(user);
+
     const message = {
         from: user,
         to,
         text,
         type
-    }
+    };
+    
     try {
         await db.collection('messages').updateOne({ _id: new ObjectId(id) }, { $set: message });
         res.sendStatus(200);
