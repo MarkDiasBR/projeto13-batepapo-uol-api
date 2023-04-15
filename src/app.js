@@ -163,6 +163,12 @@ app.delete('/messages/:id', async (req, res) => {
     let user = req.header('User');
     const { id } = req.params;
 
+    const messageFind = await db.collection('messages').findOne({ _id: new ObjectId(id) });
+
+    if (!messageFind) return res.status(404).send('Message not found');
+
+    if (messageFind.from !== user) return res.status(401).send('Unauthorized deletion')
+
     try {
         const messages = await db.collection('messages').deleteOne({ _id: new ObjectId(id) });
         res.send(messages);
