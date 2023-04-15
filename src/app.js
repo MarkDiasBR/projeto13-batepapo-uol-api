@@ -187,46 +187,39 @@ app.delete('/messages/:id', async (req, res) => {
 
 app.put('/messages/:id', async (req, res) => {
     const userHeader = { User: req.header('User') };
-
     const { id } = req.params;
     
     const messageFind = await db.collection('messages').findOne({ _id: new ObjectId(id) });
-
-    if (!messageFind) return res.status(404).send('Message not found');
-
     if (messageFind.from !== user) return res.status(401).send('Unauthorized deletion');
+    if (!messageFind) return res.status(404).send('Message not found');
 
     const userSchema = joi.object({
         to: joi.string().required(),
         text: joi.string().required(),
         type: joi.string().valid('message', 'private_message').required()
     });
-
     const validationUser = userSchema.validate(req.body, { abortEarly: false });
-
     if (validationUser.error) {
         const errors = validationUser.error.details.map((detail) => detail.message);
         return res.status(422).send(errors);
     }
     
-    const userHeaderSchema = joi.object({
-        User: joi.string().required()
-    });
-
-    const validationUserHeader = userHeaderSchema.validate(userHeader, { abortEarly: false });
-
-    if (validationUserHeader.error) {
-        const errors = validationUserHeader.error.details.map((detail) => detail.message);
-        return res.status(422).send(errors);
-    }
+    // const userHeaderSchema = joi.object({
+    //     User: joi.string().required()
+    // });
+    // const validationUserHeader = userHeaderSchema.validate(userHeader, { abortEarly: false });
+    // if (validationUserHeader.error) {
+    //     const errors = validationUserHeader.error.details.map((detail) => detail.message);
+    //     return res.status(422).send(errors);
+    // }
 
     let user = req.header('User');
 
-    const userFind = await db.collection('participants').findOne({ name: user });
+    // const userFind = await db.collection('participants').findOne({ name: user });
 
-    if (!userFind) {
-        return res.status(422).send('User not logged in.');
-    }
+    // if (!userFind) {
+    //     return res.status(422).send('User not logged in.');
+    // }
 
     let { to, text, type } = req.body;    
 
