@@ -78,7 +78,7 @@ app.post('/messages', async (req, res) => {
     const userSchema = joi.object({
         to: joi.string().required(),
         text: joi.string().required(),
-        type: joi.string().required()
+        type: joi.string().valid('message', 'private_message').required()
     });
 
     const userHeaderSchema = joi.object({
@@ -131,8 +131,28 @@ app.post('/messages', async (req, res) => {
 });
 
 app.get('/messages', async (req, res) => {
+    let limit;
+    if (req.query.hasOwnProperty('limit')) {
+        limit = Number(req.query.limit);
+
+        const limitSchema = joi.number().integer().greater(0);
+
+        const validation = limitSchema.validate(limit, { abortEarly: false });
+
+        if (validation.error) {
+            const errors = validation.error.details.map(detail => detail.message);
+            return res.status(422).send(errors);
+        } 
+    }
+
     try {
-        const messages = await db.collection('messages').find().toArray();
+        let messages = await db.collection('messages').find().toArray();
+
+        if (limit && messages.length > limit) {
+            messages = messages.slice(-limit);  
+            return res.send(messages);
+        }
+        
         res.send(messages);
     } catch (err) {
         res.status(500).send(err.message);
