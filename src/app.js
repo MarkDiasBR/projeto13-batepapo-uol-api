@@ -55,7 +55,9 @@ app.post('/participants', async (req, res) => {
             type: 'status',
             time: dayjs().format('HH:mm:ss')
         });
+
         res.status(201).send('User successfully created');
+
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -71,9 +73,42 @@ app.get('/participants', async (req, res) => {
 });
 
 app.post('/messages', async (req, res) => {
-    let { to, text, type } = req.body;
+    const userHeader = { User: req.header('User') };
+
+    const userSchema = joi.object({
+        to: joi.string().required(),
+        text: joi.string().required(),
+        type: joi.string().required()
+    });
+
+    const userHeaderSchema = joi.object({
+        User: joi.string().required()
+    });
+
+    const validationUser = userSchema.validate(req.body, { abortEarly: false });
+
+    if (validationUser.error) {
+        const errors = validationUser.error.details.map((detail) => detail.message);
+        return res.status(422).send(errors);
+    }
+
+    const validationUserHeader = userHeaderSchema.validate(userHeader, { abortEarly: false });
+
+    if (validationUserHeader.error) {
+        const errors = validationUserHeader.error.details.map((detail) => detail.message);
+        return res.status(422).send(errors);
+    }
+
     let user = req.header('User');
 
+    const userFind = await db.collection('participants').findOne({ name: user });
+
+    if (!userFind) {
+        return res.status(422).send('User not logged in.');
+    }
+
+    let { to, text, type } = req.body;
+    
     to = sanitizeInput(to);
     text = sanitizeInput(text);
     type = sanitizeInput(type);
