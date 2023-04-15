@@ -225,8 +225,8 @@ app.put('/messages/:id', async (req, res) => {
 
     to = sanitizeInput(to);
     text = sanitizeInput(text);
-    type = sanitizeInput(type);
-    user = sanitizeInput(user);
+    // type = sanitizeInput(type);
+    // user = sanitizeInput(user);
 
     const message = {
         from: user,
