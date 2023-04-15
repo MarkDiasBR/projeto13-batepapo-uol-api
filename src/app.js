@@ -109,7 +109,7 @@ app.post('/messages', async (req, res) => {
     if (!userFind) {
         res.status(422).send('User not logged in.');
         return;
-    }
+    };
 
     let { to, text, type } = req.body;
     
@@ -124,7 +124,7 @@ app.post('/messages', async (req, res) => {
         text,
         type,
         time: dayjs().format('HH:mm:ss')
-    }
+    };
 
     try {
         await db.collection('messages').insertOne( message );
