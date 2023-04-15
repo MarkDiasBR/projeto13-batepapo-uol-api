@@ -26,19 +26,25 @@ try {
 
 //AVALIADOR: Cadastro de participante
 app.post('/participants', async (req, res) => {
-    const name = sanitizeInput(req.body.name);
-       
 
     try {
         const participantSchema = joi.object({
-            name: joi.string().required
+            name: joi.string().required()
         });
 
-        const validation = participantSchema.validate({ name }, { abortEarly: false });
+        const validation = participantSchema.validate(req.body, { abortEarly: false });
 
         if (validation.error) {
             const errors = validation.error.details.map((detail) => detail.message);
             return res.status(422).send(errors);
+        }
+
+        const name = sanitizeInput(req.body.name);
+
+        const nameFind = await db.collection('participants').findOne({ name });
+
+        if (nameFind) {
+            return res.status(409).send('User already logged in.');
         }
 
         await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
