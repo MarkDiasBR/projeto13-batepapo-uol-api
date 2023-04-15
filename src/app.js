@@ -35,7 +35,8 @@ app.post('/participants', async (req, res) => {
 
         if (validation.error) {
             const errors = validation.error.details.map((detail) => detail.message);
-            return res.status(422).send(errors);
+            res.status(422).send(errors);
+            return;
         }
 
         const name = sanitizeInput(req.body.name);
@@ -43,7 +44,8 @@ app.post('/participants', async (req, res) => {
         const nameFind = await db.collection('participants').findOne({ name });
 
         if (nameFind) {
-            return res.status(409).send('User already logged in.');
+            res.status(409).send('User already logged in.');
+            return; 
         }
 
         await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
@@ -88,14 +90,16 @@ app.post('/messages', async (req, res) => {
 
     if (validationUser.error) {
         const errors = validationUser.error.details.map((detail) => detail.message);
-        return res.status(422).send(errors);
+        res.status(422).send(errors);
+        return; 
     }
 
     const validationUserHeader = userHeaderSchema.validate(userHeader, { abortEarly: false });
 
     if (validationUserHeader.error) {
         const errors = validationUserHeader.error.details.map((detail) => detail.message);
-        return res.status(422).send(errors);
+        res.status(422).send(errors);
+        return;
     }
 
     let user = req.header('User');
@@ -103,7 +107,8 @@ app.post('/messages', async (req, res) => {
     const userFind = await db.collection('participants').findOne({ name: user });
 
     if (!userFind) {
-        return res.status(422).send('User not logged in.');
+        res.status(422).send('User not logged in.');
+        return;
     }
 
     let { to, text, type } = req.body;
@@ -140,7 +145,8 @@ app.get('/messages', async (req, res) => {
 
         if (validation.error) {
             const errors = validation.error.details.map(detail => detail.message);
-            return res.status(422).send(errors);
+            res.status(422).send(errors);
+            return;
         } 
     }
 
@@ -158,7 +164,8 @@ app.get('/messages', async (req, res) => {
 
         if (limit && messages.length > limit) {
             messages = messages.slice(-limit);  
-            return res.send(messages);
+            res.send(messages);
+            return;
         }
         
         res.send(messages);
@@ -173,9 +180,15 @@ app.delete('/messages/:id', async (req, res) => {
 
     const messageFind = await db.collection('messages').findOne({ _id: new ObjectId(id) });
 
-    if (!messageFind) return res.status(404).send('Message not found');
+    if (!messageFind) {
+        res.status(404).send('Message not found');
+        return;
+    }
 
-    if (messageFind.from !== user) return res.status(401).send('Unauthorized deletion');
+    if (messageFind.from !== user) {
+        res.status(401).send('Unauthorized deletion');
+        return;
+    }
 
     try {
         const messages = await db.collection('messages').deleteOne({ _id: new ObjectId(id) });
@@ -185,64 +198,6 @@ app.delete('/messages/:id', async (req, res) => {
     };
 });
 
-// app.put('/messages/:id', async (req, res) => {
-//     const userHeader = { User: req.header('User') };
-//     const { id } = req.params;
-    
-//     const messageFind = await db.collection('messages').findOne({ _id: new ObjectId(id) });
-//     if (messageFind.from !== user) return res.status(401).send('Unauthorized deletion');
-//     if (!messageFind) return res.status(404).send('Message not found');
-
-//     const userSchema = joi.object({
-//         to: joi.string().required(),
-//         text: joi.string().required(),
-//         type: joi.string().valid('message', 'private_message').required()
-//     });
-//     const validationUser = userSchema.validate(req.body, { abortEarly: false });
-//     if (validationUser.error) {
-//         const errors = validationUser.error.details.map((detail) => detail.message);
-//         return res.status(422).send(errors);
-//     }
-    
-//     // const userHeaderSchema = joi.object({
-//     //     User: joi.string().required()
-//     // });
-//     // const validationUserHeader = userHeaderSchema.validate(userHeader, { abortEarly: false });
-//     // if (validationUserHeader.error) {
-//     //     const errors = validationUserHeader.error.details.map((detail) => detail.message);
-//     //     return res.status(422).send(errors);
-//     // }
-
-//     let user = req.header('User');
-
-//     // const userFind = await db.collection('participants').findOne({ name: user });
-
-//     // if (!userFind) {
-//     //     return res.status(422).send('User not logged in.');
-//     // }
-
-//     let { to, text, type } = req.body;    
-
-//     to = sanitizeInput(to);
-//     text = sanitizeInput(text);
-//     // type = sanitizeInput(type);
-//     // user = sanitizeInput(user);
-
-//     const message = {
-//         from: user,
-//         to,
-//         text,
-//         type
-//     };
-
-//     try {
-//         await db.collection('messages').updateOne({ _id: new ObjectId(id) }, { $set: message });
-//         res.sendStatus(200);
-//     } catch (err) {
-//         res.status(500).send(err.message);
-//     };
-// });
-
 app.put('/messages/:id', async (req, res) => {
     let { to, text, type } = req.body;
     let user = req.header('User');
@@ -251,9 +206,11 @@ app.put('/messages/:id', async (req, res) => {
     const findMessage = await db.collection('messages').findOne({ _id: new ObjectId(id) });
 
     if (!findMessage) {
-        return res.sendStatus(404);
+        res.sendStatus(404);
+        return;
     } else if (findMessage.from !== user) {
-        return res.sendStatus(401);
+        res.sendStatus(401);
+        return;
     }
 
     const messageSchema = joi.object({
@@ -266,7 +223,8 @@ app.put('/messages/:id', async (req, res) => {
 
     if (validation.error) {
         const errors = validation.error.details.map((detail) => detail.message);
-        return res.status(422).send(errors);
+        res.status(422).send(errors);
+        return;
     }
 
     to = sanitizeInput(to);
@@ -293,7 +251,8 @@ app.post('/status', async (req, res) => {
     const userFind = await db.collection('participants').findOne({ name: user });
 
     if (!userFind) {
-        return res.status(404).send('User not found.');
+        res.status(404).send('User not found.');
+        return;
     }
 
     try {
