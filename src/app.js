@@ -247,6 +247,18 @@ app.put('/messages/:id', async (req, res) => {
     let { to, text, type } = req.body;
     let user = req.header('User');
     const { id } = req.params;
+
+    const findMessage = await db.collection('messages').findOne({ _id: new ObjectId(id) });
+
+    console.log(typeof findMessage.from, typeof user)
+
+    console.log( findMessage.from, user)
+    if (!findMessage) {
+        return res.sendStatus(404);
+    } else if (findMessage.from !== user) {
+        return res.sendStatus(401);
+    }
+
     to = sanitizeInput(to);
     text = sanitizeInput(text);
     type = sanitizeInput(type);
