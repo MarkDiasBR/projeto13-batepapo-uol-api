@@ -3,6 +3,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import dayjs from 'dayjs';
+import joi from 'joi';
 import { stripHtml } from "string-strip-html";
 
 const app = express();
@@ -26,8 +27,20 @@ try {
 //AVALIADOR: Cadastro de participante
 app.post('/participants', async (req, res) => {
     const name = sanitizeInput(req.body.name);
+       
 
     try {
+        const participantSchema = joi.object({
+            name: joi.string().required
+        });
+
+        const validation = participantSchema.validate({ name }, { abortEarly: false });
+
+        if (validation.error) {
+            const errors = validation.error.details.map((detail) => detail.message);
+            return res.status(422).send(errors);
+        }
+
         await db.collection('participants').insertOne({ name, lastStatus: Date.now() });
         await db.collection('messages').insertOne({
             from: name,
