@@ -259,6 +259,19 @@ app.put('/messages/:id', async (req, res) => {
         return res.sendStatus(401);
     }
 
+    const messageSchema = joi.object({
+        to: joi.string(),
+        text: joi.string(),
+        type: joi.string()
+    });
+
+    const validation = messageSchema.validate(req.body, { abortEarly: false });
+
+    if (validation.error) {
+        const errors = validation.error.details.map((detail) => detail.message);
+        return res.status(422).send(errors);
+    }
+
     to = sanitizeInput(to);
     text = sanitizeInput(text);
     type = sanitizeInput(type);
