@@ -175,7 +175,7 @@ app.get('/messages', async (req, res) => {
 });
 
 app.delete('/messages/:id', async (req, res) => {
-    let user = req.header('User');
+    const user = req.header('User');
     const { id } = req.params;
 
     const messageFind = await db.collection('messages').findOne({ _id: new ObjectId(id) });
@@ -256,8 +256,8 @@ app.post('/status', async (req, res) => {
     }
 
     try {
-        const result = await db.collection('participants').updateOne({ name: user }, { $set: { lastStatus: Date.now() } });
-        res.send('User lastStatus updated')
+        await db.collection('participants').updateOne({ name: user }, { $set: { lastStatus: Date.now() } });
+        res.send('User lastStatus updated');
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -276,7 +276,7 @@ async function removeIdle() {
     try {
         const timestamp = Date.now();
 
-        let result = await db.collection('participants').find({ lastStatus: { $lt: (timestamp - 10000) } }).toArray();
+        const result = await db.collection('participants').find({ lastStatus: { $lt: (timestamp - 10000) } }).toArray();
 
         console.log(result);
 
