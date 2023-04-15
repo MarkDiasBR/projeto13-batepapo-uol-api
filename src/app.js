@@ -124,14 +124,14 @@ app.post('/messages', async (req, res) => {
         text,
         type,
         time: dayjs().format('HH:mm:ss')
-    };
+    }
 
     try {
         await db.collection('messages').insertOne( message );
         res.sendStatus(201);
     } catch (err) {
         res.status(500).send(err.message);
-    };
+    }
 });
 
 app.get('/messages', async (req, res) => {
@@ -171,7 +171,7 @@ app.get('/messages', async (req, res) => {
         res.send(messages);
     } catch (err) {
         res.status(500).send(err.message);
-    };
+    }
 });
 
 app.delete('/messages/:id', async (req, res) => {
@@ -195,7 +195,7 @@ app.delete('/messages/:id', async (req, res) => {
         res.send(messages);
     } catch (err) {
         res.status(500).send(err.message);
-    };
+    }
 });
 
 app.put('/messages/:id', async (req, res) => {
@@ -236,13 +236,13 @@ app.put('/messages/:id', async (req, res) => {
         to,
         text,
         type
-    };
+    }
     try {
         await db.collection('messages').updateOne({ _id: new ObjectId(id) }, { $set: message });
         res.sendStatus(200);
     } catch (err) {
         res.status(500).send(err.message);
-    };
+    }
 });
 
 app.post('/status', async (req, res) => {
@@ -260,7 +260,7 @@ app.post('/status', async (req, res) => {
         res.send('User lastStatus updated')
     } catch (err) {
         res.status(500).send(err.message);
-    };        
+    }
 });
 
 const PORT = 5000;
