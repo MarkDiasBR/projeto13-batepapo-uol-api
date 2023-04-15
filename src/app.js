@@ -144,8 +144,17 @@ app.get('/messages', async (req, res) => {
         } 
     }
 
+    const user = req.header('User');
+
     try {
-        let messages = await db.collection('messages').find().toArray();
+        let messages = await db.collection('messages').find(
+            {$or: [
+                {to: 'Todos'},
+                {type: 'message'},
+                {type: 'private_message', from: user},
+                {type: 'private_message', to: user},
+            ]}
+        ).toArray();
 
         if (limit && messages.length > limit) {
             messages = messages.slice(-limit);  
