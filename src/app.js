@@ -200,6 +200,12 @@ app.put('/messages/:id', async (req, res) => {
 app.post('/status', async (req, res) => {
     const user = req.header('User');
 
+    const userFind = await db.collection('participants').findOne({ name: user });
+
+    if (!userFind) {
+        return res.status(404).send('User not found.');
+    }
+
     try {
         const result = await db.collection('participants').updateOne({ name: user }, { $set: { lastStatus: Date.now() } });
         res.send('User lastStatus updated')
